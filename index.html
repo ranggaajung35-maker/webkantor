@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GERCEP - Tracking Pelayanan Kota Bitung</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PapaParse CDN untuk membaca CSV Google Sheets -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body class="bg-slate-50 text-gray-800 font-sans min-h-screen">
+
+    <!-- Header / Navbar -->
+    <header class="bg-teal-700 text-white shadow-md py-6">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-center sm:text-left">
+                <h1 class="text-2xl font-extrabold tracking-wide">GERCEP KOTA BITUNG</h1>
+                <p class="text-teal-100 text-xs mt-1">Sistem Pelacakan Berkas & Layanan Pengukuran Bidang Tanah</p>
+            </div>
+            <div class="bg-teal-800 px-4 py-2 rounded-lg text-xs text-teal-200 border border-teal-600">
+                Data Terhubung Langsung ke Google Sheets
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+
+        <!-- Bagian 1: Bagan Alur Pelayanan (SOP) -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-bold text-teal-800 mb-4 text-center">Bagan Alur Pelayanan Pengukuran Bidang Tanah</h2>
+            <div class="flex justify-center items-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50 p-2">
+                <img src="bagan.png" alt="Bagan Alur Pelayanan Gercep" class="max-w-full h-auto rounded-lg shadow-sm">
+            </div>
+        </section>
+
+        <!-- Bagian 2: Form Pencarian -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Cari Status Berkas Anda</h2>
+            <p class="text-sm text-gray-500 mb-4">Masukkan Nama Pemohon, Nomor Berkas, atau kata kunci lainnya untuk melacak posisi berkas.</p>
+            
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input type="text" id="searchInput" 
+                       placeholder="Ketik Nama Pemohon / No Berkas..." 
+                       class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 shadow-sm">
+                <button onclick="cariData()" 
+                        class="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition duration-150 shadow-md">
+                    Cari Data
+                </button>
+            </div>
+        </section>
+
+        <!-- Bagian 3: Tabel Data Monitoring -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 overflow-x-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Status Monitoring Berkas</h3>
+                <span id="totalData" class="text-xs bg-teal-100 text-teal-800 px-3 py-1 rounded-full font-medium">Memuat data...</span>
+            </div>
+
+            <div id="loading" class="text-center py-10 text-gray-500 text-sm">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-teal-600 border-t-transparent mb-3"></div>
+                <p>Memuat data terbaru dari Google Spreadsheet...</p>
+            </div>
+            
+            <div id="tableWrapper" class="hidden overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="dataTable">
+                    <thead id="tableHeader" class="bg-teal-700 text-white text-xs uppercase tracking-wider">
+                        <!-- Judul kolom otomatis dibaca dari Spreadsheet -->
+                    </thead>
+                    <tbody id="tableBody" class="text-sm divide-y divide-gray-100">
+                        <!-- Baris data dari CSV -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noResult" class="hidden text-center py-8 text-gray-500 text-sm">
+                Data tidak ditemukan. Pastikan kata kunci yang Anda masukkan sudah benar.
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-6 text-gray-400 text-xs border-t mt-12">
+        &copy; 2026 Layanan Gercep Kota Bitung. Semua Hak Dilindungi.
+    </footer>
+
+    <script>
+        // LINK CSV DARI SPREADSHEET ANDA
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLh92XhxudS7cnhm5l4yupvtMP6glPlE_ZEXukuH5i8JqKPdzA_kMt8-Qxv-KnPtiuI6C8OIaLMniw/pub?output=csv";
+
+        let semuaData = [];
+        let kolomHeader = [];
+
+        function loadData() {
+            Papa.parse(SHEET_CSV_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    semuaData = results.data.filter(row => {
+                        return Object.values(row).some(val => val !== null && val !== undefined && val.toString().trim() !== "");
+                    });
+
+                    if (results.meta && results.meta.fields) {
+                        kolomHeader = results.meta.fields;
+                    } else if (semuaData.length > 0) {
+                        kolomHeader = Object.keys(semuaData[0]);
+                    }
+
+                    document.getElementById("loading").classList.add("hidden");
+                    document.getElementById("tableWrapper").classList.remove("hidden");
+                    
+                    buatHeaderTabel();
+                    tampilkanData(semuaData);
+                },
+                error: function(err) {
+                    document.getElementById("loading").innerHTML = "<span class='text-red-500'>Gagal memuat data dari Spreadsheet. Pastikan koneksi internet lancar.</span>";
+                }
+            });
+        }
+
+        function buatHeaderTabel() {
+            const thead = document.getElementById("tableHeader");
+            thead.innerHTML = "";
+            const tr = document.createElement("tr");
+
+            kolomHeader.forEach((col, idx) => {
+                const th = document.createElement("th");
+                th.classList.add("py-3", "px-4", "font-semibold");
+                if (idx === 0) th.classList.add("rounded-l-lg");
+                if (idx === kolomHeader.length - 1) th.classList.add("rounded-r-lg");
+                th.innerText = col || `Kolom ${idx + 1}`;
+                tr.appendChild(th);
+            });
+
+            thead.appendChild(tr);
+        }
+
+        function tampilkanData(data) {
+            const tbody = document.getElementById("tableBody");
+            const noResult = document.getElementById("noResult");
+            const totalDataSpan = document.getElementById("totalData");
+            tbody.innerHTML = "";
+
+            if (data.length === 0) {
+                noResult.classList.remove("hidden");
+                totalDataSpan.innerText = "0 Data";
+                return;
+            } else {
+                noResult.classList.add("hidden");
+                totalDataSpan.innerText = `${data.length} Data Ditampilkan`;
+            }
+
+            data.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.classList.add("hover:bg-slate-50", "transition-colors");
+
+                kolomHeader.forEach((col, idx) => {
+                    const td = document.createElement("td");
+                    td.classList.add("py-3", "px-4", "text-gray-700");
+                    if (idx === 0) td.classList.add("font-bold", "text-gray-900");
+                    td.innerText = row[col] !== undefined && row[col] !== null ? row[col] : "-";
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function cariData() {
+            const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
+            if (!keyword) {
+                tampilkanData(semuaData);
+                return;
+            }
+
+            const filtered = semuaData.filter(row => {
+                return Object.values(row).some(val => 
+                    val && val.toString().toLowerCase().includes(keyword)
+                );
+            });
+
+            tampilkanData(filtered);
+        }
+
+        document.getElementById("searchInput").addEventListener("keyup", function(e) {
+            if (e.key === "Enter") cariData();
+        });
+
+        window.addEventListener("DOMContentLoaded", loadData);
+    </script>
+</body>
+</html>
