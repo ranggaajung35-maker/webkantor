@@ -1,104 +1,323 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GERCEP - Tracking Pelayanan Kota Bitung</title>
+    <title>GERCEP - Gerak Cepat Pelayanan Kota Bitung</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PapaParse CDN untuk membaca CSV Google Sheets -->
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PapaParse CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 </head>
-<body class="bg-slate-50 text-gray-800 font-sans min-h-screen">
+<body class="bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen">
 
-    <!-- Header / Navbar -->
-    <header class="bg-teal-700 text-white shadow-md py-6">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="text-center sm:text-left">
-                <h1 class="text-2xl font-extrabold tracking-wide">GERCEP KOTA BITUNG</h1>
-                <p class="text-teal-100 text-xs mt-1">Sistem Pelacakan Berkas & Layanan Pengukuran Bidang Tanah</p>
-            </div>
-            <div class="bg-teal-800 px-4 py-2 rounded-lg text-xs text-teal-200 border border-teal-600">
-                Data Terhubung Langsung ke Google Sheets
+    <!-- NAVBAR -->
+    <nav class="bg-white/90 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <!-- LOGO BRAND -->
+            <a href="#" class="flex items-center gap-3 shrink-0">
+                <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center shadow-md font-extrabold text-slate-900 text-xl">
+                    G
+                </div>
+                <div>
+                    <div class="font-black text-xl italic tracking-wider text-slate-900 leading-none">GERCEP</div>
+                    <div class="text-[10px] font-bold text-yellow-500 tracking-widest mt-0.5">KOTA BITUNG</div>
+                </div>
+            </a>
+
+            <!-- MENU LINKS -->
+            <div class="hidden lg:flex items-center gap-6 font-semibold text-sm text-slate-600">
+                <a href="#" class="hover:text-slate-900 transition-colors">Beranda</a>
+                <a href="#search-section" class="hover:text-slate-900 transition-colors">Lacak Berkas</a>
+                <a href="#monitoring-ploting-section" class="hover:text-slate-900 transition-colors">Monitoring Ploting</a>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfiljv2TMqU7WxmjQmTLXTlyikGSxhLmgLK4cBbKjS2xxSpHw/viewform?usp=sharing&ouid=110876651218452206441" target="_blank" class="hover:text-slate-900 transition-colors">Survei Kinerja</a>
+                <a href="#dashboard-section" class="hover:text-slate-900 transition-colors">Dashboard GERCEP!</a>
+                <a href="https://wa.me/6282353402431" target="_blank" class="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-5 py-2.5 rounded-full font-bold text-xs transition-all shadow-sm flex items-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-base"></i>
+                    <span>Konsultasi Teknis</span>
+                </a>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <!-- HERO / CEK STATUS BERKAS SECTION (BAGAN BACKGROUND) -->
+    <section id="search-section" class="relative py-16 md:py-24 px-4 overflow-hidden flex items-center justify-center min-h-[500px]">
+        <!-- BACKGROUND IMAGE WITH OVERLAY -->
+        <div class="absolute inset-0 z-0 bg-cover bg-center filter blur-[1px] opacity-25 scale-105" style="background-image: url('bagan.png');"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-amber-100/40 via-yellow-50/20 to-slate-50 z-0"></div>
 
-        <!-- Bagian 1: Bagan Alur Pelayanan (SOP) -->
-        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-bold text-teal-800 mb-4 text-center">Bagan Alur Pelayanan Pengukuran Bidang Tanah</h2>
-            <div class="flex justify-center items-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50 p-2">
-                <img src="bagan.png" alt="Bagan Alur Pelayanan Gercep" class="max-w-full h-auto rounded-lg shadow-sm">
+        <!-- FLOATING CARD PENCARIAN BERKAS -->
+        <div class="relative z-10 max-w-3xl w-full bg-white/95 backdrop-blur-xl rounded-[32px] p-8 md:p-12 shadow-2xl border border-slate-100 text-center space-y-6">
+            <div class="space-y-2">
+                <span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-extrabold tracking-wider uppercase mb-1">
+                    Layanan Utama
+                </span>
+                <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Cek Status Berkas</h1>
+                <p class="text-slate-500 text-sm md:text-base font-medium">Masukkan nomor berkas Anda untuk melihat detail progres real-time.</p>
             </div>
-        </section>
 
-        <!-- Bagian 2: Form Pencarian -->
-        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Cari Status Berkas Anda</h2>
-            <p class="text-sm text-gray-500 mb-4">Masukkan Nama Pemohon, Nomor Berkas, atau kata kunci lainnya untuk melacak posisi berkas.</p>
-            
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input type="text" id="searchInput" 
-                       placeholder="Ketik Nama Pemohon / No Berkas..." 
-                       class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 shadow-sm">
-                <button onclick="cariData()" 
-                        class="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition duration-150 shadow-md">
-                    Cari Data
+            <!-- SEARCH FORM -->
+            <form onsubmit="event.preventDefault(); handleSearch();" class="flex flex-col sm:flex-row items-center gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-200/80 focus-within:ring-2 focus-within:ring-slate-900 transition-all">
+                <div class="flex items-center gap-3 px-3 w-full text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    <input type="text" id="searchInput" placeholder="Contoh: 98/2026" class="w-full bg-transparent py-2.5 text-slate-800 placeholder-slate-400 text-sm md:text-base outline-none font-medium">
+                </div>
+                <button type="submit" class="w-full sm:w-auto bg-[#0B192C] hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0 text-sm shadow-md">
+                    <span>Cari</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
-            </div>
-        </section>
+            </form>
+        </div>
+    </section>
 
-        <!-- Bagian 3: Tabel Data Monitoring -->
-        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 overflow-x-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-800">Status Monitoring Berkas</h3>
-                <span id="totalData" class="text-xs bg-teal-100 text-teal-800 px-3 py-1 rounded-full font-medium">Memuat data...</span>
+    <!-- HASIL PENCARIAN BERKAS -->
+    <section id="results-container" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 -mt-4 relative z-20">
+        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-yellow-500"></i> Hasil Pencarian Berkas
+                </h3>
+                <span id="dataCount" class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">0 Berkas</span>
             </div>
 
-            <div id="loading" class="text-center py-10 text-gray-500 text-sm">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-teal-600 border-t-transparent mb-3"></div>
-                <p>Memuat data terbaru dari Google Spreadsheet...</p>
-            </div>
-            
-            <div id="tableWrapper" class="hidden overflow-x-auto">
-                <table class="w-full text-left border-collapse" id="dataTable">
-                    <thead id="tableHeader" class="bg-teal-700 text-white text-xs uppercase tracking-wider">
-                        <!-- Judul kolom otomatis dibaca dari Spreadsheet -->
+            <div id="tableWrapper" class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr id="tableHeader" class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200"></tr>
                     </thead>
-                    <tbody id="tableBody" class="text-sm divide-y divide-gray-100">
-                        <!-- Baris data dari CSV -->
-                    </tbody>
+                    <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
                 </table>
             </div>
 
-            <div id="noResult" class="hidden text-center py-8 text-gray-500 text-sm">
-                Data tidak ditemukan. Pastikan kata kunci yang Anda masukkan sudah benar.
+            <div id="noResult" class="hidden py-12 text-center space-y-2">
+                <i class="fa-solid fa-file-circle-xmark text-4xl text-amber-400"></i>
+                <p class="text-slate-700 font-bold text-sm">Data tidak ditemukan.</p>
+                <p class="text-slate-400 text-xs">Pastikan nomor berkas yang Anda masukkan sudah benar.</p>
             </div>
-        </section>
+        </div>
+    </section>
 
-    </main>
+    <!-- FITUR BARU: MONITORING PLOTING & SURVEI & KONSULTASI GRID -->
+    <section id="monitoring-ploting-section" class="py-12 md:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-12">
+        
+        <!-- CARDS FITUR LINTAS AKSES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- CARD SURVEI KINERJA -->
+            <div class="bg-gradient-to-br from-amber-500 to-yellow-500 text-slate-900 rounded-3xl p-8 shadow-lg flex flex-col justify-between space-y-6">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 bg-slate-900/10 rounded-2xl flex items-center justify-center text-slate-900 text-xl font-bold">
+                        <i class="fa-solid fa-clipboard-question"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold tracking-tight">Survei Kinerja Petugas Ukur</h3>
+                    <p class="text-slate-900/80 text-sm font-medium leading-relaxed">
+                        Bantu kami meningkatkan kualitas pelayanan dengan mengisi lembar survei kepuasan terhadap kinerja petugas pengukuran.
+                    </p>
+                </div>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfiljv2TMqU7WxmjQmTLXTlyikGSxhLmgLK4cBbKjS2xxSpHw/viewform?usp=sharing&ouid=110876651218452206441" target="_blank" class="inline-flex items-center justify-center gap-2 bg-slate-900 text-white font-bold px-6 py-3.5 rounded-2xl hover:bg-slate-800 transition-all text-sm w-full sm:w-auto shadow-md">
+                    <span>Isi Survei Kinerja</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                </a>
+            </div>
 
-    <footer class="text-center py-6 text-gray-400 text-xs border-t mt-12">
-        &copy; 2026 Layanan Gercep Kota Bitung. Semua Hak Dilindungi.
+            <!-- CARD KONSULTASI TEKNIS -->
+            <div class="bg-[#0B192C] text-white rounded-3xl p-8 shadow-lg flex flex-col justify-between space-y-6 border border-slate-800">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center text-xl font-bold border border-emerald-500/30">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold tracking-tight">Konsultasi Teknis Pengukuran</h3>
+                    <p class="text-slate-400 text-sm font-medium leading-relaxed">
+                        Punya pertanyaan seputar kendala pemetaan atau teknis pengukuran? Hubungi langsung tim konsultasi kami via WhatsApp.
+                    </p>
+                </div>
+                <a href="https://wa.me/6282353402431" target="_blank" class="inline-flex items-center justify-center gap-2 bg-emerald-500 text-white font-bold px-6 py-3.5 rounded-2xl hover:bg-emerald-600 transition-all text-sm w-full sm:w-auto shadow-md">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Chat WhatsApp (082353402431)</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- SECTION MONITORING PLOTING -->
+        <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 space-y-6">
+            <div class="border-b border-slate-100 pb-6 space-y-1">
+                <span class="text-xs font-black tracking-widest text-yellow-500 uppercase">FITUR BARU</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Monitoring Ploting Sertipikat</h2>
+                <p class="text-slate-500 text-sm">Cari status ploting berdasarkan nama kelurahan dan nomor sertipikat Anda.</p>
+            </div>
+
+            <!-- FORM PENCARIAN PLOTING -->
+            <form onsubmit="event.preventDefault(); handlePlotingSearch();" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div class="md:col-span-5 bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center gap-3">
+                    <i class="fa-solid fa-location-dot text-yellow-500 text-lg ml-2"></i>
+                    <input type="text" id="plotKelurahanInput" placeholder="Nama Kelurahan (contoh: Manembo-nembo)" class="w-full bg-transparent text-sm font-medium outline-none text-slate-800 placeholder-slate-400">
+                </div>
+                <div class="md:col-span-5 bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center gap-3">
+                    <i class="fa-solid fa-certificate text-yellow-500 text-lg ml-2"></i>
+                    <input type="text" id="plotSertipikatInput" placeholder="Nomor Sertipikat (contoh: 01234)" class="w-full bg-transparent text-sm font-medium outline-none text-slate-800 placeholder-slate-400">
+                </div>
+                <button type="submit" class="md:col-span-2 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Cari Ploting</span>
+                </button>
+            </form>
+
+            <!-- TABEL HASIL MONITORING PLOTING -->
+            <div id="plotingResults" class="hidden pt-4 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span id="plotDataCount" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full">0 Data Ditemukan</span>
+                </div>
+                <div class="overflow-x-auto rounded-2xl border border-slate-100">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100/80 text-slate-700 font-extrabold border-b border-slate-200">
+                                <th class="px-5 py-3.5 whitespace-nowrap">Nama Pemohon</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Kelurahan</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">No. Sertipikat</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Status</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Keterangan</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap text-center">Berita Acara Ploting</th>
+                            </tr>
+                        </thead>
+                        <tbody id="plotingTableBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- NO RESULT PLOTING -->
+            <div id="plotNoResult" class="hidden py-10 text-center space-y-2">
+                <i class="fa-solid fa-folder-open text-4xl text-amber-400"></i>
+                <p class="text-slate-800 font-bold text-sm">Data Ploting Tidak Ditemukan</p>
+                <p class="text-slate-400 text-xs">Coba periksa kembali kata kunci Nama Kelurahan atau Nomor Sertipikat yang dimasukkan.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DASHBOARD TERKINI SECTION -->
+    <section id="dashboard-section" class="py-12 md:py-20 bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full rounded-3xl my-8 border border-slate-100">
+        <div class="space-y-8">
+            <!-- HEADER SECTION -->
+            <div>
+                <span class="text-xs font-black tracking-widest text-yellow-500 uppercase">DASHBOARD TERKINI</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Kinerja & Progres Berkas</h2>
+            </div>
+
+            <!-- DASHBOARD GRID: CHART + CARDS -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- LEFT: DOUGHNUT CHART -->
+                <div class="lg:col-span-5 flex items-center justify-center p-6">
+                    <div class="relative w-64 h-64 md:w-72 md:h-72 flex items-center justify-center">
+                        <canvas id="statusChart"></canvas>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                            <span id="chartTotalNum" class="text-4xl md:text-5xl font-black text-slate-900 leading-none">0</span>
+                            <span class="text-[10px] md:text-xs font-bold text-slate-400 tracking-widest uppercase mt-1">TOTAL BERKAS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: STAT CARDS (2x2 GRID) -->
+                <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    
+                    <!-- BERKAS SELESAI -->
+                    <div class="bg-slate-50/80 p-6 rounded-2xl border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <div class="text-[10px] font-black text-slate-400 tracking-wider uppercase">BERKAS SELESAI</div>
+                            <div id="cardSelesai" class="text-3xl md:text-4xl font-extrabold text-emerald-500 mt-1">0</div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </div>
+
+                    <!-- BERKAS DALAM PROSES -->
+                    <div class="bg-slate-50/80 p-6 rounded-2xl border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <div class="text-[10px] font-black text-slate-400 tracking-wider uppercase">BERKAS DALAM PROSES</div>
+                            <div id="cardProses" class="text-3xl md:text-4xl font-extrabold text-yellow-500 mt-1">0</div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-yellow-100/80 text-yellow-600 flex items-center justify-center text-xl">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                    </div>
+
+                    <!-- BERKAS KENDALA -->
+                    <div class="bg-slate-50/80 p-6 rounded-2xl border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <div class="text-[10px] font-black text-slate-400 tracking-wider uppercase">BERKAS KENDALA</div>
+                            <div id="cardKendala" class="text-3xl md:text-4xl font-extrabold text-rose-500 mt-1">0</div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-rose-100/80 text-rose-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL BERKAS (DARK CARD) -->
+                    <div class="bg-[#0B192C] text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
+                        <div>
+                            <div class="text-[10px] font-black text-slate-400 tracking-wider uppercase">TOTAL BERKAS</div>
+                            <div id="cardTotal" class="text-3xl md:text-4xl font-extrabold text-white mt-1">0</div>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-slate-800 text-yellow-400 flex items-center justify-center text-xl border border-slate-700">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER DARK -->
+    <footer class="bg-[#0B192C] text-white pt-16 pb-8 px-4 mt-auto">
+        <div class="max-w-4xl mx-auto text-center space-y-4">
+            <h3 class="text-2xl md:text-3xl font-extrabold tracking-tight">Kantor Pertanahan Kota Bitung</h3>
+            <p class="text-slate-400 text-xs md:text-sm font-medium leading-relaxed">
+                Jl. Stadion 2 Saudara,Manembo-nembo Tengah,Kec. Matuari,Kota Bitung,Sulawesi Utara.
+            </p>
+            
+            <!-- GARIS PEMBATAS & COPYRIGHT -->
+            <div class="pt-8 border-t border-slate-800/80">
+                <p class="text-slate-400 text-xs md:text-sm font-normal">
+                    © 2026 Seksi Survei dan Pemetaan Kantor Pertanahan Kota Bitung.
+                </p>
+            </div>
+        </div>
     </footer>
 
+    <!-- SCRIPT INTEGRASI DATA & LOGIKA PENCARIAN -->
     <script>
-        // LINK CSV DARI SPREADSHEET ANDA
+        // SPREADSHEET URLs
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTLh92XhxudS7cnhm5l4yupvtMP6glPlE_ZEXukuH5i8JqKPdzA_kMt8-Qxv-KnPtiuI6C8OIaLMniw/pub?output=csv";
+        const PLOTING_CSV_URL = "https://docs.google.com/spreadsheets/d/1W3acwiMvNnWNMJkFrMThJ86Y9EMscyUEPm8drX7CZ9k/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent("Monitoring ploting");
 
         let semuaData = [];
         let kolomHeader = [];
+        let plotingData = [];
+        let myChart = null;
 
-        function loadData() {
+        document.addEventListener("DOMContentLoaded", () => {
+            loadSpreadsheetData();
+            loadPlotingData();
+        });
+
+        // LOAD DATA UTAMA BERKAS
+        function loadSpreadsheetData() {
             Papa.parse(SHEET_CSV_URL, {
                 download: true,
                 header: true,
                 skipEmptyLines: true,
                 complete: function(results) {
                     semuaData = results.data.filter(row => {
-                        return Object.values(row).some(val => val !== null && val !== undefined && val.toString().trim() !== "");
+                        return Object.values(row).some(val => val !== null && val !== undefined && String(val).trim() !== '');
                     });
 
                     if (results.meta && results.meta.fields) {
@@ -107,87 +326,238 @@
                         kolomHeader = Object.keys(semuaData[0]);
                     }
 
-                    document.getElementById("loading").classList.add("hidden");
-                    document.getElementById("tableWrapper").classList.remove("hidden");
-                    
-                    buatHeaderTabel();
-                    tampilkanData(semuaData);
-                },
-                error: function(err) {
-                    document.getElementById("loading").innerHTML = "<span class='text-red-500'>Gagal memuat data dari Spreadsheet. Pastikan koneksi internet lancar.</span>";
+                    updateDashboardStats(semuaData);
                 }
             });
         }
 
-        function buatHeaderTabel() {
-            const thead = document.getElementById("tableHeader");
-            thead.innerHTML = "";
-            const tr = document.createElement("tr");
-
-            kolomHeader.forEach((col, idx) => {
-                const th = document.createElement("th");
-                th.classList.add("py-3", "px-4", "font-semibold");
-                if (idx === 0) th.classList.add("rounded-l-lg");
-                if (idx === kolomHeader.length - 1) th.classList.add("rounded-r-lg");
-                th.innerText = col || `Kolom ${idx + 1}`;
-                tr.appendChild(th);
+        // LOAD DATA MONITORING PLOTING
+        function loadPlotingData() {
+            Papa.parse(PLOTING_CSV_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    plotingData = results.data.filter(row => {
+                        return Object.values(row).some(val => val !== null && val !== undefined && String(val).trim() !== '');
+                    });
+                }
             });
-
-            thead.appendChild(tr);
         }
 
-        function tampilkanData(data) {
-            const tbody = document.getElementById("tableBody");
-            const noResult = document.getElementById("noResult");
-            const totalDataSpan = document.getElementById("totalData");
-            tbody.innerHTML = "";
-
-            if (data.length === 0) {
-                noResult.classList.remove("hidden");
-                totalDataSpan.innerText = "0 Data";
-                return;
-            } else {
-                noResult.classList.add("hidden");
-                totalDataSpan.innerText = `${data.length} Data Ditampilkan`;
-            }
+        // DASHBOARD STATS & CHART
+        function updateDashboardStats(data) {
+            let total = data.length;
+            let selesai = 0;
+            let proses = 0;
+            let kendala = 0;
 
             data.forEach(row => {
-                const tr = document.createElement("tr");
-                tr.classList.add("hover:bg-slate-50", "transition-colors");
+                const text = Object.values(row).join(" ").toLowerCase();
+                if (text.includes("selesai")) {
+                    selesai++;
+                } else if (text.includes("kendala") || text.includes("batal") || text.includes("revisi")) {
+                    kendala++;
+                } else {
+                    proses++;
+                }
+            });
 
-                kolomHeader.forEach((col, idx) => {
-                    const td = document.createElement("td");
-                    td.classList.add("py-3", "px-4", "text-gray-700");
-                    if (idx === 0) td.classList.add("font-bold", "text-gray-900");
-                    td.innerText = row[col] !== undefined && row[col] !== null ? row[col] : "-";
-                    tr.appendChild(td);
-                });
+            document.getElementById("chartTotalNum").textContent = total;
+            document.getElementById("cardTotal").textContent = total;
+            document.getElementById("cardSelesai").textContent = selesai;
+            document.getElementById("cardProses").textContent = proses;
+            document.getElementById("cardKendala").textContent = kendala;
 
-                tbody.appendChild(tr);
+            renderChart(selesai, proses, kendala);
+        }
+
+        function renderChart(selesai, proses, kendala) {
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Selesai', 'Dalam Proses', 'Kendala'],
+                    datasets: [{
+                        data: [selesai, proses, kendala],
+                        backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    cutout: '80%',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    }
+                }
             });
         }
 
-        function cariData() {
-            const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
-            if (!keyword) {
-                tampilkanData(semuaData);
+        // SEARCH PENCARIAN BERKAS UTAMA
+        function handleSearch() {
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
+            const container = document.getElementById("results-container");
+            const tableHeader = document.getElementById("tableHeader");
+            const tableBody = document.getElementById("tableBody");
+            const noResult = document.getElementById("noResult");
+            const tableWrapper = document.getElementById("tableWrapper");
+            const dataCount = document.getElementById("dataCount");
+
+            if (query === "") {
+                container.classList.add("hidden");
                 return;
             }
+
+            container.classList.remove("hidden");
 
             const filtered = semuaData.filter(row => {
                 return Object.values(row).some(val => 
-                    val && val.toString().toLowerCase().includes(keyword)
+                    String(val).toLowerCase().includes(query)
                 );
             });
 
-            tampilkanData(filtered);
+            if (filtered.length === 0) {
+                tableWrapper.classList.add("hidden");
+                noResult.classList.remove("hidden");
+                dataCount.textContent = "0 Berkas";
+                return;
+            }
+
+            tableWrapper.classList.remove("hidden");
+            noResult.classList.add("hidden");
+            dataCount.textContent = `${filtered.length} Berkas ditemukan`;
+
+            tableHeader.innerHTML = kolomHeader.map(col => `
+                <th class="px-4 py-3 whitespace-nowrap">${escapeHTML(col)}</th>
+            `).join("");
+
+            tableBody.innerHTML = filtered.map(row => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    ${kolomHeader.map(col => {
+                        const val = row[col] || "-";
+                        return `<td class="px-4 py-3.5 whitespace-nowrap">${formatCell(val, col)}</td>`;
+                    }).join("")}
+                </tr>
+            `).join("");
+
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        document.getElementById("searchInput").addEventListener("keyup", function(e) {
-            if (e.key === "Enter") cariData();
-        });
+        // SEARCH MONITORING PLOTING (KELURAHAN + NOMOR SERTIPIKAT)
+        function handlePlotingSearch() {
+            const kelurahanQuery = document.getElementById("plotKelurahanInput").value.toLowerCase().trim();
+            const sertipikatQuery = document.getElementById("plotSertipikatInput").value.toLowerCase().trim();
+            const plotResults = document.getElementById("plotingResults");
+            const plotNoResult = document.getElementById("plotNoResult");
+            const plotTableBody = document.getElementById("plotingTableBody");
+            const plotDataCount = document.getElementById("plotDataCount");
 
-        window.addEventListener("DOMContentLoaded", loadData);
+            if (kelurahanQuery === "" && sertipikatQuery === "") {
+                plotResults.classList.add("hidden");
+                plotNoResult.classList.add("hidden");
+                return;
+            }
+
+            // FILTER DATA PLOTING FLEXIBLE
+            const filtered = plotingData.filter(row => {
+                const textRow = JSON.stringify(row).toLowerCase();
+                const matchKel = kelurahanQuery === "" || textRow.includes(kelurahanQuery);
+                const matchCert = sertipikatQuery === "" || textRow.includes(sertipikatQuery);
+                return matchKel && matchCert;
+            });
+
+            if (filtered.length === 0) {
+                plotResults.classList.add("hidden");
+                plotNoResult.classList.remove("hidden");
+                return;
+            }
+
+            plotNoResult.classList.add("hidden");
+            plotResults.classList.remove("hidden");
+            plotDataCount.textContent = `${filtered.length} Data Ploting Ditemukan`;
+
+            plotTableBody.innerHTML = filtered.map(row => {
+                // Deteksi Nama Kolom
+                const keys = Object.keys(row);
+                const getVal = (keywords) => {
+                    const foundKey = keys.find(k => keywords.some(kw => k.toLowerCase().includes(kw)));
+                    return foundKey ? row[foundKey] : "-";
+                };
+
+                const namaPemohon = getVal(["pemohon", "nama"]);
+                const kelurahan = getVal(["kelurahan", "desa"]);
+                const noSertipikat = getVal(["sertipikat", "sertifikat", "no"]);
+                const status = getVal(["status"]);
+                const keterangan = getVal(["keterangan", "ket"]);
+                const linkBA = getVal(["berita", "acara", "ba", "link", "download", "unduh", "file"]);
+
+                // BADGE STATUS PLOTING
+                let statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">${escapeHTML(status)}</span>`;
+                const lowerStatus = String(status).toLowerCase();
+                if (lowerStatus.includes("selesai") || lowerStatus.includes("terploting")) {
+                    statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>${escapeHTML(status)}</span>`;
+                } else if (lowerStatus.includes("proses")) {
+                    statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700"><span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>${escapeHTML(status)}</span>`;
+                } else if (lowerStatus.includes("kendala") || lowerStatus.includes("revisi")) {
+                    statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>${escapeHTML(status)}</span>`;
+                }
+
+                // LINK UNDUH BA PLOTING
+                let downloadBtn = `<span class="text-xs text-slate-400 font-medium">Belum Ada File</span>`;
+                if (linkBA && linkBA !== "-" && linkBA.startsWith("http")) {
+                    downloadBtn = `
+                        <a href="${escapeHTML(linkBA)}" target="_blank" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-sm">
+                            <i class="fa-solid fa-file-pdf text-amber-400"></i>
+                            <span>Unduh BA</span>
+                        </a>
+                    `;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-5 py-4 font-semibold text-slate-900 whitespace-nowrap">${escapeHTML(namaPemohon)}</td>
+                        <td class="px-5 py-4 whitespace-nowrap">${escapeHTML(kelurahan)}</td>
+                        <td class="px-5 py-4 whitespace-nowrap font-medium text-slate-800">${escapeHTML(noSertipikat)}</td>
+                        <td class="px-5 py-4 whitespace-nowrap">${statusBadge}</td>
+                        <td class="px-5 py-4 text-xs font-medium text-slate-600 max-w-xs truncate">${escapeHTML(keterangan)}</td>
+                        <td class="px-5 py-4 whitespace-nowrap text-center">${downloadBtn}</td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        function formatCell(val, colName) {
+            const lowerCol = colName.toLowerCase();
+            const lowerVal = String(val).toLowerCase();
+
+            if (lowerCol.includes("status") || lowerCol.includes("keterangan")) {
+                if (lowerVal.includes("selesai")) {
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>${escapeHTML(val)}</span>`;
+                } else if (lowerVal.includes("proses") || lowerVal.includes("ukur")) {
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700"><span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>${escapeHTML(val)}</span>`;
+                } else if (lowerVal.includes("batal") || lowerVal.includes("kendala")) {
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>${escapeHTML(val)}</span>`;
+                }
+            }
+            return escapeHTML(val);
+        }
+
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
     </script>
 </body>
 </html>
